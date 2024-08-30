@@ -5,33 +5,31 @@ import os
 with open("C:\\Users\\iroba\\OneDrive\\Escritorio\\1000.txt", 'r') as archivo:
     contenido = archivo.read()
 
-    # Define una expresión regular para identificar bloques de comentarios largos y reemplazarlos temporalmente
-    patron_largo = r"\"\"\"[\s\S]*?\"\"\""
-    contenido_sin_largos = re.sub(patron_largo, '', contenido)
+    # Define la expresión regular para identificar comentarios largos
+    patron_largo = r"\"\"\"[\s\S]*?\"\"\""  # Captura todo el contenido dentro de comillas triples
 
-    # Define una expresión regular para identificar comentarios cortos que no estén dentro de bloques largos
-    patron_corto = r"#.*"
-    comentarios_cortos = re.findall(patron_corto, contenido_sin_largos)
-
-    # Encuentra los comentarios largos de nuevo (para guardarlos)
+    # Encuentra y cuenta los comentarios largos
     comentarios_largos = re.findall(patron_largo, contenido)
 
-    # Guarda los comentarios cortos y largos en un solo archivo
+    # Elimina los comentarios largos del contenido para evitar contar comentarios cortos dentro de ellos
+    contenido_sin_largos = re.sub(patron_largo, "", contenido)
+
+    # Define la expresión regular para identificar comentarios cortos que no estén dentro de bloques largos
+    patron_corto = r"#.*(?!(\"\"\"))"  # Captura comentarios cortos que no están en comentarios largos
+
+    # Encuentra y cuenta los comentarios cortos en el contenido sin comentarios largos
+    comentarios_cortos = re.findall(patron_corto, contenido_sin_largos)
+
+    # Guarda el conteo de comentarios en un archivo
     with open("C:\\Users\\iroba\\OneDrive\\Escritorio\\comentarios.txt", 'w') as archivo:
-        archivo.write("Comentarios Cortos:\n")
-        for comentario in comentarios_cortos:
-            archivo.write(comentario + '\n')
+        archivo.write(f"comentarios cortos = {len(comentarios_cortos)}\n")
+        archivo.write(f"comentarios largos = {len(comentarios_largos)}\n")
 
-        archivo.write("\nComentarios Largos:\n")
-        for comentario in comentarios_largos:
-            archivo.write(comentario + '\n')
+    print("El conteo de comentarios ha sido guardado en el archivo 'comentarios.txt'.")
 
-    print(
-        f"Se han guardado {len(comentarios_cortos)} comentarios cortos y {len(comentarios_largos)} comentarios largos en el archivo 'comentarios.txt'.")
 
-    # Ruta al archivo que quieres abrir
+# Ruta al archivo que quieres abrir
     archivo_path = "C:\\Users\\iroba\\OneDrive\\Escritorio\\comentarios.txt"
 
-    # Abre el archivo en la aplicación predeterminada del sistema
-    os.startfile(archivo_path)
-
+# Abre el archivo en la aplicación predeterminada del sistema
+os.startfile(archivo_path)
