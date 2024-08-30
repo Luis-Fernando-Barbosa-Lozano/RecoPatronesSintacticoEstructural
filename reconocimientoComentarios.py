@@ -5,15 +5,13 @@ import os
 with open("C:\\Users\\iroba\\OneDrive\\Escritorio\\1000.txt", 'r') as archivo:
     contenido = archivo.read()
 
-    # Define una expresión regular para identificar comentarios en Python
-    patron = r"#.*"
+    # Define una expresión regular para identificar comentarios con # y bloques de comentarios con triples comillas
+    patron_corto = r"#.*"
+    patron_largo = r"\"\"\"[\s\S]*?\"\"\""
 
-    # Encuentra todas las coincidencias que sigan el patrón
-    comentarios = re.findall(patron, contenido)
-
-    # Diferencia entre comentarios cortos y largos
-    comentarios_cortos = [comentario for comentario in comentarios if len(comentario) < 40]
-    comentarios_largos = [comentario for comentario in comentarios if len(comentario) >= 40]
+    # Encuentra todas las coincidencias que sigan cada patrón
+    comentarios_cortos = re.findall(patron_corto, contenido)
+    comentarios_largos = re.findall(patron_largo, contenido)
 
     # Guarda los comentarios cortos y largos en un solo archivo
     with open("C:\\Users\\iroba\\OneDrive\\Escritorio\\comentarios.txt", 'w') as archivo:
