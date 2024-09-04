@@ -4,3 +4,5 @@ with open("C:\\Users\\iroba\\OneDrive\\Escritorio\\1000.txt", 'r') as archivo:
 cadenas = contenido.split()
 longitud = len(cadenas)
 print(longitud)
+
+print("Tenshi")
