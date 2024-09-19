@@ -2,33 +2,45 @@ import re
 import os
 
 def ReconocimientoDeComentarios():
-    # Abre el archivo y lee su contenido
+    # Abre el archivo y lee su contenido línea por línea
     with open("codigo_prueba.txt", 'r') as archivo:
-        contenido = archivo.read()
+        lineas = archivo.readlines()
 
-        # Define una expresión regular para identificar comentarios con # y bloques de comentarios con triples comillas
-        patron_corto = r"#.*"
-        patron_largo = r"\"\"\"[\s\S]*?\"\"\""
+    # Define las expresiones regulares para identificar comentarios cortos y bloques de comentarios largos (tanto con comillas dobles como simples)
+    patron_corto = r"#.*"
+    patron_largo = r"\"\"\"[\s\S]*?\"\"\""
+    patrondos_largo = r"\'\'\'[\s\S]*?\'\'\'"
 
-        # Encuentra todas las coincidencias que sigan cada patrón
-        comentarios_cortos = re.findall(patron_corto, contenido)
-        comentarios_largos = re.findall(patron_largo, contenido)
+    # Abre el archivo de salida donde se guardarán los resultados
+    with open("C:\\Users\\rico_\\OneDrive\\Escritorio\\tareas UnU\\RPSE\\RecoPatronesSintacticoEstructural\\comentarios.txt", 'w') as archivo_salida:
+        dentro_comentario_largo = False
+        dentro_comentario_largodos = False
 
-        # Guarda los comentarios cortos y largos en un solo archivo
-        with open("C:\\Users\\rico_\\OneDrive\\Escritorio\\tareas UnU\\RPSE\\RecoPatronesSintacticoEstructural\\comentarios.txt", 'w') as archivo:
-            archivo.write("Comentarios Cortos:\n")
-            for comentario in comentarios_cortos:
-                archivo.write(comentario + '\n')
+        for linea in lineas:
+            # Verifica si la línea contiene un comentario corto
+            if re.match(patron_corto, linea):
+                archivo_salida.write("Token Comentario Corto\n")
+            # Verifica si estamos dentro o al final de un bloque de comentario largo (comillas dobles)
+            elif re.match(patron_largo, linea) or dentro_comentario_largo:
+                archivo_salida.write("Token Comentario Largo\n")
+                if '"""' in linea:
+                    dentro_comentario_largo = not dentro_comentario_largo
+            # Verifica si estamos dentro o al final de un bloque de comentario largo (comillas simples)
+            elif re.match(patrondos_largo, linea) or dentro_comentario_largodos:
+                archivo_salida.write("Token Comentario Largo\n")
+                if "'''" in linea:
+                    dentro_comentario_largodos = not dentro_comentario_largodos
+            else:
+                # Escribe la línea sin modificaciones si no es un comentario
+                archivo_salida.write(linea)
 
-            archivo.write("\nComentarios Largos:\n")
-            for comentario in comentarios_largos:
-                archivo.write(comentario + '\n')
+    print(f"El archivo ha sido procesado y guardado en 'comentarios.txt'.")
 
-        print(f"Se han guardado {len(comentarios_cortos)} comentarios cortos y {len(comentarios_largos)} comentarios largos en el archivo 'comentarios.txt'.")
+    # Ruta al archivo que quieres abrir
+    archivo_path = "C:\\Users\\rico_\\OneDrive\\Escritorio\\tareas UnU\\RPSE\\RecoPatronesSintacticoEstructural\\comentarios.txt"
 
-        # Ruta al archivo que quieres abrir
-        archivo_path ="C:\\Users\\rico_\\OneDrive\\Escritorio\\tareas UnU\\RPSE\\RecoPatronesSintacticoEstructural\\comentarios.txt"
+    # Abre el archivo en la aplicación predeterminada del sistema
+    os.startfile(archivo_path)
 
-        # Abre el archivo en la aplicación predeterminada del sistema
-        os.startfile(archivo_path)
+# Llamada a la función
 ReconocimientoDeComentarios()
