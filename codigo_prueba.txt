@@ -1,12 +1,12 @@
 import math
 import re
 #Entrada de Individuos en formato binario separado por comas
-
+'''
 indBin = input('Ingrese individuos binarios separados por comas>>> ')
 
 #Obteniendo la Función de activación
 fnAdap = input('ingrese la función de adaptación: f(x)= ')
-
+'''
 # Obteniendo el Mínimo y Máximo de la función
 minMax = input('ingrese el máximo y el mínimo separados por comas>>> ')
 
@@ -66,14 +66,14 @@ math_functions = {
 
 # Obtener valor Adaptado
 valAdap = []
-'''
+"""
 for ind in valReal:
     # Insertar el operador de multiplicación donde sea necesario
     expr = re.sub(r'(\d)([a-zA-Z])', r'\1*\2', fnAdSnEsp)
 
     # Reemplaza 'x' por el valor real en la función
     expr = expr.replace('x', str(ind))  # Sustituimos X por el valor real del individuo
-'''
+"""
     # Evalúa la expresión de manera segura usando las funciones matemáticas
     resultado = eval(expr, {"__builtins__": None}, math_functions)
     valAdap.append(round(resultado, 3))
