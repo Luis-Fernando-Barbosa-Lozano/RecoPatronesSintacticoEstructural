@@ -2,7 +2,7 @@ import re
 import os
 
 # Abre el archivo y lee su contenido
-with open("C:\\Users\\iroba\\OneDrive\\Escritorio\\1000.txt", 'r') as archivo:
+with open("prueba_codigo.txt", 'r') as archivo:
     contenido = archivo.read()
 
     # Define la expresión regular para identificar comentarios largos

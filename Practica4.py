@@ -2,7 +2,7 @@ import os
 import re
 
 # Abre el archivo y lee su contenido
-with open("C:\\Users\\iroba\\OneDrive\\Escritorio\\1000.txt", 'r') as archivo:
+with open("prueba_codigo.txt", 'r') as archivo:
     contenido = archivo.read()
 
 with open("C:\\Users\\iroba\\OneDrive\\Escritorio\\1000.txt", 'r') as archivo:
