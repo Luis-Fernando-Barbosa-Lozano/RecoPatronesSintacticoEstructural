@@ -2,7 +2,7 @@ import re
 import os
 
 # Abre el archivo y lee su contenido
-with open("C:\\Users\\iroba\\OneDrive\\Escritorio\\1000.txt", 'r') as archivo:
+with open("codigo_prueba.txt", 'r') as archivo:
     contenido = archivo.read()
 
     # Define una expresión regular para identificar comentarios con # y bloques de comentarios con triples comillas
