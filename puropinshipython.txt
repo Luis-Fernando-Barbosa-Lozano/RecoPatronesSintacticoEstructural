@@ -1,0 +1,1066 @@
+import cv2
+import numpy as np
+"""
+# Cargar la imagen
+imagen = cv2.imread('libropro.jpg')
+# Convertir la imagen a escala de grises
+gris = cv2.cvtColor(imagen, cv2.COLOR_BGR2GRAY)
+"""
+# Umbralizar la imagen usando el método de Otsu
+umbral, binaria = cv2.threshold(gris, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+
+img_redimensionada = cv2.resize(img, (0, 0), fx=.25, fy=.25)
+
+# Mostrar la imagen binaria
+cv2.imshow('Imagen binaria', img_redimensionada)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+import cv2
+import numpy as np
+
+imagen_original = cv2.imread ('libro.jpeg')
+
+
+cv2.imshow('Imagen original', imagen_original)
+
+#remueve el ruido con gaussian blur
+imagen = cv2.GaussianBlur(imagen_original, (3,3), 0)
+
+#usar umbral adaptativo
+umbral= cv2.adaptiveThreshold(imagen, 255, cv2.ADAPTIVE_THRESH_MEAN_C, 
+                              cv2.THRESH_BINARY, 3, 5)
+cv2.imshow('umbral adaptativo', umbral)
+
+_, umbral2 = cv2.threshold(imagen, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+cv2.imshow('umbral otsu', umbral2)
+import cv2
+imagen = cv2.imread('lenguado.jpg')
+#smaller = cv2.pyrDown(imagen)
+#larger = cv2.pyrDown(smaller)
+
+#extrae y guarda en variables separadas el largo y ancho 
+alto, ancho = imagen.shape[:2]
+
+#toma los puntos iniciales del fragmento a mostrar
+FilaInicial, ColumnaInicial = int (alto* .25),int(ancho*.25)
+##toma los puntos finales del fragmento a mostrar
+FilaFinal, ColumnaFinal = int(alto*.75), int(ancho*.75)
+#junta en una variable los puntos iniciales y finales 
+imagenFinal = imagen[FilaInicial: FilaFinal, ColumnaInicial: ColumnaFinal]
+#cv2.imshow('original', imagen)
+#cv2.imshow('smaller', smaller)
+#cv2.imshow('larger', larger)
+
+
+cv2.imshow('imagenFinal',imagenFinal)
+cv2.waitKey()
+cv2.destroyAllWindows()
+
+import cv2
+
+# 1. Cargar la imagen
+imagen = cv2.imread('casitaxd.jpeg')
+
+# 2. Convertir a escala de grises
+gris = cv2.cvtColor(imagen, cv2.COLOR_BGR2GRAY)
+
+# 3. Binarizar la imagen con un umbral de 127 y aplicar el umbral binario inverso
+_, binaria = cv2.threshold(gris, 127, 255, cv2.THRESH_BINARY_INV)
+
+# 4. Encontrar los contornos del objeto
+contornos, _ = cv2.findContours(binaria, cv2.RETR_LIST, cv2.CHAIN_APPROX_NONE)
+
+# 5. Para cada uno de los contornos dibujar un rectángulo verde utilizando la función cv2.boundingRect
+for contorno in contornos:
+    x, y, w, h = cv2.boundingRect(contorno)
+    cv2.rectangle(imagen, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+
+for controno in contornos:
+    precision = 0.03 * cv2.arcLength(contorno, True)
+    approx = cv2.approxPolyDP(contorno, precision, True)
+    cv2.drawContours(imagen, [approx], 0, (0, 255, 0), 2)
+    
+# Mostrar la imagen con los rectángulos dibujados
+cv2.imshow('Imagen con contornos', imagen)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+import cv2
+import numpy as np
+
+# Cargar la imagen a color
+imagen_color = cv2.imread('figuras.jpeg')
+
+# Crear una imagen en color negro rellena con las mismas dimensiones que la original
+imagen_negra = np.zeros_like(imagen_color)
+
+# Convertir la imagen original a escala de grises
+imagen_gris = cv2.cvtColor(imagen_color, cv2.COLOR_BGR2GRAY)
+
+# Aplicar el filtro Canny
+imagen_canny = cv2.Canny(imagen_gris, 50, 200)
+
+# Encontrar los contornos
+contornos, _ = cv2.findContours(imagen_canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+# Imprimir la cantidad de contornos encontrados
+print("Cantidad de contornos encontrados:", len(contornos))
+
+# Dibujar todos los contornos en la imagen creada (imagen_negra)
+cv2.drawContours(imagen_negra, contornos, -1, (255, 255, 255), 2)
+
+# Volver a dibujar los contornos en la imagen original
+cv2.drawContours(imagen_color, contornos, -1, (0, 255, 0), 2)
+
+# Función para obtener las áreas de los contornos
+def obtener_areas(contornos):
+    areas = []
+    for contorno in contornos:
+        area = cv2.contourArea(contorno)
+        areas.append(area)
+    return areas
+
+# Obtener las áreas de los contornos
+areas_contornos = obtener_areas(contornos)
+
+# Ordenar las áreas de mayor a menor
+areas_contornos.sort(reverse=True)
+
+# Iterar sobre los 4 contornos ya ordenados y dibujar uno a la vez
+for i in range(min(len(areas_contornos), 4)):
+    contorno = contornos[i]
+    cv2.drawContours(imagen_color, [contorno], 0, (0, 0, 255), 2)
+
+    # Calcular el momento del contorno para encontrar el centroide
+    M = cv2.moments(contorno)
+    cX = int(M["m10"] / M["m00"])
+    cY = int(M["m01"] / M["m00"])
+
+    # Dibujar un círculo rojo en el centroide
+    cv2.circle(imagen_color, (cX, cY), 5, (0, 0, 255), -1)
+
+# Mostrar las imágenes
+cv2.imshow("Imagen Original", imagen_color)
+cv2.imshow("Imagen Negra", imagen_negra)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+import cv2
+import numpy as np
+
+
+image = cv2.imread('redondos.jpeg', cv2.IMREAD_GRAYSCALE)
+params = cv2.SimpleBlobDetector_Params()
+params.filterByCircularity = True
+params.minCircularity = 0.8
+
+detector = cv2.SimpleBlobDetector_create(params)
+keypoints = detector.detect(image)
+num_cir = len(keypoints)
+print("Número de círculos:",str (num_cir))
+salida_cir = str (num_cir)
+
+image_with_keypoints = cv2.drawKeypoints(image, keypoints, np.array([]), (0,0,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+cv2.putText(image_with_keypoints,"Numero de circulos: "+ salida_cir , (10,30), 0, 1, (0,0,255),2,cv2.LINE_AA)
+
+cv2.imshow("Imagen con circulos", image_with_keypoints)
+
+params = cv2.SimpleBlobDetector_Params()
+params.filterByCircularity = True
+params.minCircularity = 0.2
+detector = cv2.SimpleBlobDetector_create(params)
+
+keypoints = detector.detect(image)
+
+num_fig = len(keypoints)
+
+print("Número de figuras:",str (num_fig))
+
+num_ova = num_fig - num_cir
+print("Número de ovalos:",str (num_ova))
+salida_ova = str (num_ova)
+# Dibujar los blobs en la imagen
+image_with_keypoints = cv2.drawKeypoints(image, keypoints, np.array([]), (255,255,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+cv2.putText(image_with_keypoints,"El numero de Ovalos: "+salida_ova ,(10,30), 0, 1, (0,0,255),2,cv2.LINE_AA)
+# Mostrar la imagen con los blobs
+cv2.imshow("Imagen con figuras", image_with_keypoints)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+import cv2
+import numpy as np
+
+# 1. Cargar la imagen a color
+imagen_original = cv2.imread('FigurasPractica.jpeg')
+
+# imagen negra
+imagen_negra = np.zeros_like(imagen_original)
+
+# Convierte a gris
+imagen_gris = cv2.cvtColor(imagen_original, cv2.COLOR_BGR2GRAY)
+
+# Aplica el filtro Canny 
+canny = cv2.Canny(imagen_gris, 50, 200)
+
+# Encontrar los contornos e imprimir
+contornos, _ = cv2.findContours(canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+print(f'Se encontraron {len(contornos)} contornos.')
+
+#Dibujar todos los contornos en la imagen negra
+cv2.drawContours(imagen_negra, contornos, -1, (255, 255, 255), thickness=cv2.FILLED)
+
+#dibuja los contornos en la imagen original
+cv2.drawContours(imagen_original, contornos, -1, (0, 255, 0), thickness=2)
+
+# función que reciba la variable contornos y retorne un arreglo con las áreas de las figuras
+def obtener_areas(contornos):
+    areas = []
+    for contorno in contornos:
+        area = cv2.contourArea(contorno)
+        areas.append(area)
+    return areas
+
+# Ordenar las áreas de mayor a menor
+areas_ordenadas = sorted(obtener_areas(contornos), reverse=True)
+
+# Itera para dibujar los contornos de mayor a menor 
+indice_contorno = 0
+
+while True:
+
+    cv2.imshow('Imagen Original', imagen_original)
+    key = cv2.waitKey(0)
+    
+    # "q" para terminar el bucle
+    if key == ord('q'):
+        break
+    
+    # Dibuja el siguiente contorno 
+    if indice_contorno < len(contornos):
+        area_actual = areas_ordenadas[indice_contorno]
+        indice_contorno += 1
+        
+        for contorno in contornos:
+            if cv2.contourArea(contorno) == area_actual:
+                cv2.drawContours(imagen_original, [contorno], -1, (0, 0, 255), thickness=2)
+                
+                # Calcular el momento del contorno para encontrar el centroide
+                M = cv2.moments(contorno)
+                cX = int(M["m10"] / M["m00"])
+                cY = int(M["m01"] / M["m00"])
+
+                # Dibujar un círculo rojo en el centroide
+                cv2.circle(imagen_original, (cX, cY), 5, (0, 0, 255), -1)
+
+                break
+
+cv2.destroyAllWindows()
+import cv2
+import numpy as np
+
+imagen = cv2.imread('pruebaim.jpeg')
+
+gris = cv2.cvtColor(imagen, cv2.COLOR_BGR2GRAY)
+#realza los contornos con este paso 
+bordes = cv2.Canny(gris, 30, 200, apertureSize=3)
+#detecta los bordes ya resaltados
+contorno, jerarquia = cv2.findContours(bordes, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+#(la imagen, contorno, "-1" imprime todos; "0" imprime el primero, "1" imprime el tercero..., color, grosor)
+im_contorno = cv2.drawContours(imagen, contorno, -1, (0,255,0),2)
+
+cv2.imshow('imagen', im_contorno)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+import cv2
+import numpy as np
+
+# Cargar la imagen, escala de grises
+imagen = cv2.imread('louvre.jpeg',0)
+
+alto, ancho = imagen.shape
+
+#resalta bordes
+sobel_x = cv2.Sobel(imagen, cv2.CV_64F, 0,1,ksize=5)
+sobel_y = cv2.Sobel(imagen, cv2.CV_64F, 1,0,ksize=5)
+
+imagen_or = cv2.bitwise_or(sobel_x, sobel_y)
+
+laplacian = cv2.Laplacian(imagen, cv2.CV_64F)
+
+#(imagen,intesidad de borde, tope de deteccion)
+canny = cv2.Canny(imagen, 10, 255)
+cv2.imshow('Canny', canny)
+"""
+cv2.imshow('Original', imagen)
+cv2.imshow('Sabel x', sobel_x)
+cv2.imshow('Sobel_y', sobel_y)
+cv2.imshow('sobel or', imagen_or)
+cv2.imshow('laplacian', laplacian)
+"""
+
+cv2.waitKey(0)
+
+# Cierra todas las ventanas
+cv2.destroyAllWindows()
+import cv2
+import numpy as np
+
+
+# Cargar la imagen
+image = cv2.imread('redondos.jpeg', cv2.IMREAD_GRAYSCALE)
+
+# Inicializar el detector de blobs
+params = cv2.SimpleBlobDetector_Params()
+
+# Definir los parámetros del detector de blobs
+params.filterByArea = True
+params.minArea = 100
+params.filterByCircularity = True
+params.minCircularity = 0.8
+
+detector = cv2.SimpleBlobDetector_create(params)
+
+# Detectar los blobs en la imagen
+keypoints = detector.detect(image)
+
+# Contar el número de blobs (círculos)
+num_circles = len(keypoints)
+
+print("Número de círculos:",str (num_circles))
+#print("Número de figuras:",str (keypoints))
+
+# Dibujar los blobs en la imagen
+image_with_keypoints = cv2.drawKeypoints(image, keypoints, np.array([]), (0,0,255), cv2.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+# Mostrar la imagen con los blobs
+cv2.imshow("Image with Circles", image_with_keypoints)
+print("Número de círculos:",str (num_circles))
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+import cv2
+import numpy as np
+
+def detectar_y_transformar(imagen):
+  """
+  Esta función detecta un contorno rectangular en una imagen y la transforma a una vista de arriba hacia abajo.
+
+  Args:
+      imagen: La imagen a procesar.
+
+  Returns:
+      La imagen transformada o None si no se encuentra ningún contorno rectangular.
+  """
+
+  # Convertir la imagen a escala de grises
+  gris = cv2.cvtColor(imagen, cv2.COLOR_BGR2GRAY)
+
+  # Detectar bordes usando Canny
+  bordes = cv2.Canny(gris, 50, 150, apertureSize=3)
+
+  # Encontrar contornos en la imagen
+  contornos, _ = cv2.findContours(bordes, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+  # Inicializar variables para almacenar el área y contorno más grande
+  area_maxima = 0
+  mejor_ contorno = None
+
+  # Recorrer todos los contornos
+  for contorno in contornos:
+    # Calcular el área del contorno
+    area = cv2.contourArea(contorno)
+
+    # Actualizar el área máxima y el mejor contorno si el área es mayor
+    if area > area_maxima:
+      area_maxima = area
+      mejor_contorno = contorno
+
+  # Si se encontró un contorno rectangular
+  if mejor_contorno is not None:
+    # Aproximar el contorno por un polígono con un máximo del 2% de error
+    aproximacion = cv2.approxPolyDP(mejor_contorno, 0.02 * cv2.arcLength(mejor_contorno, True), True)
+
+    # Verificar si la aproximación tiene 4 lados (rectángulo)
+    if len(aproximacion) == 4:
+      # Extraer los puntos de las esquinas del rectángulo aproximado
+      puntos = np.float32([aproximacion[0][0], aproximacion[1][0], aproximacion[2][0], aproximacion[3][0]])
+
+      # Definir el ancho y alto de la imagen transformada (tamaño carta)
+      ancho = 612
+      alto = 792
+
+      # Definir los puntos de destino para la transformación
+      puntos_destino = np.float32([[0, 0], [ancho - 1, 0], [ancho - 1, alto - 1], [0, alto - 1]])
+
+      # Calcular la matriz de transformación de perspectiva
+      M = cv2.getPerspectiveTransform(puntos, puntos_destino)
+
+      # Transformar la imagen usando la matriz obtenida
+      transformada = cv2.warpPerspective(imagen, M, (ancho, alto))
+
+      # Devolver la imagen transformada
+      return transformada
+
+  # Si no se encontró un contorno rectangular, devolver None
+  return None
+
+# Iniciar la captura de video desde la webcam
+cap = cv2.VideoCapture(0)
+
+while True:
+  # Capturar un frame de la webcam
+  ret, frame = cap.read()
+
+  # Verificar si se capturó el frame correctamente
+  if not ret:
+    break
+
+  # Detectar y transformar el frame
+  warped = detectar_y_transformar(frame)
+
+  # Mostrar la imagen original y la transformada (si existe)
+  if warped is not None:
+    cv2.imshow('Transformada', warped)
+  cv2.imshow('Original', frame)
+
+  # Salir con la tecla 'q'
+  if cv2.waitKey(1) & 0xFF == ord('q'):
+    break
+
+# Liberar los recursos de la captura de video
+cap.release()
+
+# Cerrar todas las ventanas abiertas
+cv2.destroyAllWindows()
+import cv2
+import numpy as np
+
+# 1. Cargar la imagen a color.
+imagen = cv2.imread('figuras.jpeg')
+
+# 2. Crear una imagen en color negro rellena de color negro con las mismas dimensiones que la original 1280x524.
+nigga = np.zeros_like(imagen)
+
+# 3. Convertir la imagen original a escala de grises
+gris = cv2.cvtColor(imagen, cv2.COLOR_BGR2GRAY)
+
+# 4. Aplicar el filtro Canny con valores 50,200
+edges = cv2.Canny(gris, 50, 200)
+
+# 5. Encontrar los contornos e imprimir cuántos encontró.
+contorno, _ = cv2.findContours(edges, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+print(f'Se encontraron {len(contorno)} contornos.')
+
+# 6. Dibujar todos los contornos en la imagen creada, la imagen en negro
+cv2.drawContours(nigga, contorno, -1, (255,255,255), 1)
+
+# 7. Volver a dibujar los contornos en la imagen original
+cv2.drawContours(imagen, contorno, -1, (0, 0, 255), 2)
+
+# Mostrar las imágenes
+cv2.imshow('Contornos en imagen negra', nigga)
+cv2.imshow('Contornos en imagen original', imagen)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+import cv2
+import numpy as np
+imagen = cv2.imread('malenia2.jpg')
+imagen_gris = cv2.cvtColor(imagen, cv2.COLOR_BGR2GRAY)
+alto, ancho = imagen_gris.shape[:2]
+matriz = np.zeros((alto,ancho),dtype=np.uint8)
+matriz[:]=175
+imagenSuma = cv2.add(imagen_gris, matriz)
+
+imagenResta = cv2.subtract(imagen, matriz)
+
+cv2.imshow('suma', imagenSuma)
+cv2.imshow('resta', imagenResta)
+cv2.waitKey(0)
+import cv2
+import numpy as np
+
+imagen_negro = np.zeros((300, 300), dtype=np.uint8)
+
+cv2.rectangle(imagen_negro, (50, 50), (250, 250), (255, 255, 255), -1)
+
+imagen_elipse = np.zeros((300, 300), dtype=np.uint8)
+
+cv2.ellipse(imagen_elipse, (150, 150), (150, 150), 30, 0, 180, (255, 255, 255), -1)
+
+#AND
+imagen_and = cv2.bitwise_and(imagen_negro, imagen_elipse)
+
+# OR
+imagen_or = cv2.bitwise_or(imagen_negro, imagen_elipse)
+
+# NOT
+imagen_not = cv2.bitwise_not(imagen_negro)
+
+# XOR
+imagen_xor = cv2.bitwise_xor(imagen_elipse, imagen_negro)
+
+# Mostrar las imágenes
+cv2.imshow("Imagen con rectangulo", imagen_negro)
+cv2.imshow("Imagen con elipse", imagen_elipse)
+cv2.imshow("Imagen AND", imagen_and)
+cv2.imshow("Imagen OR", imagen_or)
+cv2.imshow("Imagen NOT", imagen_not)
+cv2.imshow("Imagen XOR", imagen_xor)
+
+# Esperar a que se presione una tecla para cerrar las ventanas
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+import cv2
+import numpy as np
+
+# Leer la imagen en escala de grises
+imagen = cv2.imread('FigurasPractica.jpeg', cv2.IMREAD_GRAYSCALE)
+
+# Binarizar la imagen
+_, binarizada = cv2.threshold(imagen, 127, 255, cv2.THRESH_BINARY)
+
+# Encontrar los contornos
+contornos, _ = cv2.findContours(binarizada, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+# Diccionario para mapear el número de lados con el nombre de la figura
+figuras = {
+    3: 'Triángulo',
+    4: 'Rectángulo',
+    5: 'Pentágono',
+    6: 'Hexágono',
+    # Añadir más figuras según sea necesario
+}
+
+# Iterar sobre los contornos
+for contorno in contornos:
+    # Obtener el polígono aproximado
+    perimetro = cv2.arcLength(contorno, True)
+    aprox = cv2.approxPolyDP(contorno, 0.04 * perimetro, True)
+    
+    # Calcular el centroide
+    M = cv2.moments(aprox)
+    cx = int(M['m10'] / M['m00'])
+    cy = int(M['m01'] / M['m00'])
+    
+    # Etiquetar la figura
+    num_lados = len(aprox)
+    figura = figuras.get(num_lados, 'Desconocido')
+    
+    # Dibujar el contorno y el nombre de la figura
+    cv2.drawContours(imagen, [aprox], 0, (0, 255, 0), 2)
+    cv2.putText(imagen, figura, (cx, cy), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
+
+# Mostrar la imagen con los contornos y etiquetas
+cv2.imshow('Imagen con contornos', imagen)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Mar  8 18:59:23 2024
+
+@author: munoz
+"""
+
+import cv2
+import numpy as np
+
+imagen_Original = cv2.imread('FigurasPractica.jpeg')
+
+imagen_Gris = cv2.cvtColor(imagen_Original, cv2.COLOR_BGR2GRAY)
+
+_, umbral = cv2.threshold(imagen_Gris, 127, 255, cv2.THRESH_BINARY)
+
+contornos , jerarquia = cv2.findContours(umbral, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+
+
+def ordenar_areas(contornos):
+    areas = []
+    for contorno in contornos:
+        area = cv2.contourArea(contorno)
+        areas.append(area)
+    return areas
+    areas = [cv2.contourArea(c) for c in contornos]  # Calculate areas
+    # Convert areas to integers (assuming areas are positive)
+    int_areas = [int(round(area)) for area in areas]
+    indices = np.argsort(int_areas)[::-1]  # Sort and reverse
+    return indices
+
+def dibujar_contornos(imagen, contornos):
+  indices = ordenar_areas(contornos)
+  i = 0
+  while i < len(indices):
+    
+    tecla = cv2.waitKey(0) & 0xFF
+    if tecla == ord('q'):
+      break
+    i += 1
+
+areas_contornos = ordenar_areas(contornos)
+
+# Iterar sobre los 5 contornos ya ordenados y dibujar uno a la vez
+for i in range(min(len(areas_contornos), 5)):
+    #calcular la precision en porcentaje del contorno del perimetro
+    contorno = contornos[i]
+
+    #arcLength calcula el perimetro de un contorno, el 0.03 es que estara aproximado al preimetro original
+    #en los parametros de arc el true es porque es figura cerrada
+    precision = 0.03 * cv2.arcLength(contorno, True)
+    #en los parametros de approx el true es porque es figura cerrada
+    #Sirve para simplificar el contorno de un objeto
+    approx = cv2.approxPolyDP(contorno, precision, True)
+
+    # Calcular el momento del contorno para encontrar el centroide
+    M = cv2.moments(contorno)
+    cX = int(M["m10"] / M["m00"])
+    cY = int(M["m01"] / M["m00"])
+
+    for c in contornos:
+        cv2.imshow('Poligono aproximado', imagen_Original)
+        if len(approx)==3:
+            cv2.fillPoly(imagen_Original, [contorno], (0,255,255))
+            cv2.putText(imagen_Original, 'Triangulo',(cX, cY) , cv2.FONT_ITALIC,1, (255,0,0),2,cv2.LINE_AA)
+        elif len(approx) == 4:
+            # D) Calcular la relacion de aspecto para diferenciar cuadrado de rectangulo
+            
+            
+            
+            x, y, w, h = cv2.boundingRect(approx)
+            relacion_aspecto = w / h
+            if relacion_aspecto >= 0.9 and relacion_aspecto <= 1.1:
+                cv2.fillPoly(imagen_Original, [contorno], (0,0,255))
+                cv2.putText(imagen_Original, 'Cuadrado',(cX, cY) , cv2.FONT_HERSHEY_SIMPLEX,1, (255,0,0),2,cv2.LINE_AA)
+            else:
+                cv2.fillPoly(imagen_Original, [contorno], (125,175,255))
+                cv2.putText(imagen_Original, 'Rectangulo',(cX, cY) , cv2.FONT_HERSHEY_SIMPLEX,1, (255,0,0),2,cv2.LINE_AA)
+        elif len(approx) == 10:
+            cv2.fillPoly(imagen_Original, [contorno], (255,0,255))
+            cv2.putText(imagen_Original, 'Estrella',(cX, cY) , cv2.FONT_HERSHEY_SIMPLEX,1, (255,0,0),2,cv2.LINE_AA)
+        else:
+            cv2.fillPoly(imagen_Original, [contorno], (255,255,0))
+            cv2.putText(imagen_Original, 'Circulo',(cX, cY) , cv2.FONT_HERSHEY_SIMPLEX,1, (255,0,0),2,cv2.LINE_AA)
+    dibujar_contornos(imagen_Original, contornos)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+import cv2
+import numpy as np
+def detectar_figuras(imagen):
+  """
+  Detecta figuras geométricas en una imagen.
+
+  Parámetros:
+    imagen: La imagen a analizar.
+
+  Retorno:
+    Una lista con las figuras detectadas.
+  """
+
+  # Convertir a escala de grises
+  gris = cv2.cvtColor(imagen, cv2.COLOR_BGR2GRAY)
+
+  # Binarizar la imagen
+  binaria = cv2.threshold(gris, 127, 255, cv2.THRESH_BINARY)[1]
+
+  # Encontrar los contornos
+  contornos, _ = cv2.findContours(binaria, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+  figuras = []
+
+  for contorno in contornos:
+    # Obtener el mejor polígono aproximado
+    poligono = cv2.approxPolyDP(contorno, 0.01 * cv2.arcLength(contorno, True), True)
+
+    # Verificar la longitud del polígono
+    if len(poligono) >= 3:
+      # Detectar la figura
+      figura = detectar_figura(poligono)
+
+      # Encontrar el centroide
+      centroide = encontrar_centroide(contorno)
+
+      # Agregar la figura a la lista
+      figuras.append({
+        "nombre": figura,
+        "centroide": centroide
+      })
+
+  return figuras
+
+def detectar_figura(poligono):
+  """
+  Detecta la figura geométrica a partir de un polígono.
+
+  Parámetros:
+    poligono: El polígono a analizar.
+
+  Retorno:
+    El nombre de la figura detectada.
+  """
+
+  numero_lados = len(poligono)
+
+  if numero_lados == 3:
+    return "Triángulo"
+  elif numero_lados == 4:
+    # Verificar si es un cuadrado o un rectángulo
+    angulo_mayor = 0
+    for i in range(numero_lados):
+      angulo = abs(poligono[i][0] - poligono[(i + 1) % numero_lados][0])
+      if angulo > angulo_mayor:
+        angulo_mayor = angulo
+    if angulo_mayor < 10:
+      return "Cuadrado"
+    else:
+      return "Rectángulo"
+  elif numero_lados == 5:
+    return "Pentágono"
+  elif numero_lados == 6:
+    return "Hexágono"
+  elif numero_lados >= 7:
+    return "Círculo"
+
+def encontrar_centroide(contorno):
+  """
+  Encuentra el centroide de un contorno.
+
+  Parámetros:
+    contorno: El contorno a analizar.
+
+  Retorno:
+    El centroide del contorno.
+  """
+
+  M = cv2.moments(contorno)
+  cX = int(M["m10"] / M["m00"])
+  cY = int(M["m01"] / M["m00"])
+
+  return (cX, cY)
+
+def mostrar_figuras(imagen, figuras):
+  """
+  Muestra las figuras detectadas en una imagen.
+
+  Parámetros:
+    imagen: La imagen a mostrar.
+    figuras: La lista de figuras detectadas.
+  """
+
+  for figura in figuras:
+    # Pintar el área de la figura
+    cv2.drawContours(imagen, [figura["contorno"]], -1, (0, 255, 0), 2)
+
+    # Poner la etiqueta en el centroide
+    cv2.putText(imagen, figura["nombre"], figura["centroide"], cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+
+  cv2.imshow("Figuras detectadas", imagen)
+import cv2
+import numpy as np
+#Dibujar imagenes y formas  usando OpenCV 
+
+#Imgen fondo negro
+imagen_negro =np.zeros((600,600,3), np.uint8)
+
+#dibujar lineas
+#cv2.line(imagen_negro, (0,0),(600,600), (0,255,0),5)
+
+#Genera un rectangulo
+#cv2.rectangle(imagen_negro,(80,80), (510,310), (0,0,250),3)
+
+#Genera un circulo
+#cv2.circle(imagen_negro,(300,300) , (230), (0,0,255),3)
+
+#puntos = np.array([[80, 50], [200, 200], [300, 200], [350, 450], [499,500]])
+#cv2.polylines(imagen_negro, [puntos], False, (0,0,255),3)
+
+#Genera texto 
+#font = cv2.FONT_HERSHEY_SIMPLEX
+#cv2.puttext(donde se imprime, texto, ubicacion, fuente, tamaño, color, grosor, tipo de linea)
+#cv2.putText(imagen_negro, 'Hola Mundo', (100,80), font, 1, (0,0,255), 3,cv2.LINE_AA)
+#cv2.putText(imagen_negro, 'Hola Mundo', (100,120), font, 1, (0,255,0), 3,cv2.LINE_AA)
+#cv2.putText(imagen_negro, 'Hola Mundo', (100,160), font, 1, (255,0,0), 3,cv2.LINE_AA)
+
+
+imagen = cv2.imread('malenia.jpeg')
+#saca las columnas
+ancho = imagen.shape[1]
+#saca las filas
+alto = imagen.shape[0] 
+
+#traslación
+#tras = np.float32([[1,0,10],[0,1,100]]) 
+#imagenTras = cv2.warpAffine(imagen, tras, (ancho,alto))
+
+#rotacion 
+#rot = cv2.getRotationMatrix2D((ancho//2,alto//2), 20, 1)
+#imagenRot = cv2.warpAffine(imagen, rot, (ancho,alto))
+
+#interpolacion
+def interpolacion (imagen,tamanoNue,metodo ='bilineal'):
+    metodosInter ={
+        'bilineal':cv2.INTER_LINEAR, 'vecino mas cercano': cv2.INTER_NEAREST, 
+        'cubica': cv2.INTER_CUBIC }
+    metodo = metodosInter.get(metodo, cv2.INTER_LINEAR)
+    imagenInterpolada = cv2.resize(imagen, tamanoNue,interpolation=metodo)
+    return imagenInterpolada
+imagenInterpolada = interpolacion(imagen.copy(), (1920,1080))
+
+
+#Muestra la figura
+cv2.imshow('Interpolacion', imagenInterpolada)
+cv2.waitKey()
+cv2.destroyAllWindows()
+import cv2
+import numpy as np
+
+imagen = cv2.imread('opencv.jpeg')
+cv2.imshow ('Imagen original' , imagen)
+
+kernel = np.ones((5,5),np.uint8)
+
+#erosion
+erosion = cv2.erode(imagen, kernel,iterations=1)
+cv2.imshow ('erocion' , erosion)
+
+#dilatacion 
+dilatacion = cv2.dilate(imagen, kernel, iterations=1)
+cv2.imshow('Dilatacion ', dilatacion)
+
+# Apertura
+apertura = cv2.morphologyEx(imagen, cv2.MORPH_OPEN, kernel)
+cv2.imshow('Apertura ', apertura)
+
+# cierre 
+cierre = cv2.morphologyEx(imagen, cv2.MORPH_CLOSE, kernel)
+cv2.imshow('Cierre', cierre)
+
+cv2.waitKey(0)
+
+# Cierra todas las ventanas
+cv2.destroyAllWindows()
+import cv2
+import numpy as np
+
+def detectar_y_transformar(imagen):
+    
+  # escala de grises
+  gris = cv2.cvtColor(imagen, cv2.COLOR_BGR2GRAY)
+
+  # Detectar bordes usando Canny
+  bordes = cv2.Canny(gris, 50, 150, apertureSize=3)
+
+  # Encontrar contornos en la imagen
+  contornos, _ = cv2.findContours(bordes, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+  #  variables del área y contorno más grande
+  area_maxima = 0
+  mejor_contorno = None
+
+  # Recorrer los contornos y buscar el de mayor área
+  for contorno in contornos:
+    area = cv2.contourArea(contorno)
+    if area > area_maxima:
+      area_maxima = area
+      mejor_contorno = contorno
+
+  # Si se encontró un contorno adecuado, aproximarlo a un polígono
+  if mejor_contorno is not None:
+    aproximacion = cv2.approxPolyDP(mejor_contorno, 0.02 * cv2.arcLength(mejor_contorno, True), True)
+
+    # Verificar si es rectángulo
+    if len(aproximacion) == 4:
+      # Definir puntos del contorno original
+      puntos = np.float32(aproximacion)
+
+      # Definir ancho y alto 
+      ancho = 612
+      alto = 792
+
+      # Definir puntos destino en la imagen transformada
+      puntos_destino = np.float32([[0, 0], [ancho - 1, 0], [ancho - 1, alto - 1], [0, alto - 1]])
+
+      #  matriz de transformación perspectiva
+      M = cv2.getPerspectiveTransform(puntos, puntos_destino)
+
+      # Transformar la imagen usando la matriz M
+      warped = cv2.warpPerspective(imagen, M, (ancho, alto))
+
+      # Devolver la imagen transformada
+      return warped
+
+  # Si no se encuentra un contorno, devolver None
+  return None
+
+# Abre la cámara
+cap = cv2.VideoCapture(0)
+
+while True:
+  # Capturar un frame de la cámara
+  ret, frame = cap.read()
+
+  # Verificar si se capturó el frame correctamente
+  if not ret:
+    break
+
+  # Detectar y transformar el frame
+  warped = detectar_y_transformar(frame)
+
+  # Mostrar la imagen original y la transformada (si existe)
+  if warped is not None:
+    cv2.imshow('Transformada', warped)
+
+  cv2.imshow('Original', frame)
+
+  # Salir con 'q'
+  if cv2.waitKey(1) & 0xFF == ord('q'):
+    break
+
+# Liberar la captura de la cámara y cerrar ventanas
+cap.release()
+cv2.destroyAllWindows()
+import cv2
+import numpy as np
+
+imagen = cv2.imread('rei2.jpeg')
+
+ #MASCARA BORDES
+mascara_bordes = np.array([[-1, -1, -1],
+                           [-1,  9, -1],
+                           [-1, -1, -1]])
+
+imagen_bordes = cv2.filter2D(imagen, -1, mascara_bordes)
+
+cv2.imshow('Imagen original', imagen)
+cv2.imshow('Imagen bordes', imagen_bordes)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+#************************
+"""
+mascara_realce = np.array([[0, -1, 0],
+                                [-1, 5, -1],
+                                [0, -1, 0]])
+
+imagen_marcada = cv2.filter2D(imagen, -1, mascara_realce)
+"""
+#************
+"""
+mascara_lineasH = np.array([[1, 1, 1],
+                                       [0, 0, 0],
+                                       [-1, -1, -1]])
+
+imagen_lineasH = cv2.filter2D(imagen, -1, mascara_lineasH)
+"""
+#*******************
+"""
+mascara_lineasV = np.array([[-1, 0, 1],
+                                       [0, 0, 0],
+                                       [1, 0, -1]])
+
+imagen_lineasV = cv2.filter2D(imagen, -1, mascara_lineasV)
+"""
+#********************
+"""
+mascara_esquinas = np.array([[ 1,  0, -1],
+                              [ 0,  2,  0],
+                              [-1,  0,  1]])
+
+imagen_esquinas = cv2.filter2D(imagen, -1, mascara_esquinas)
+"""
+
+cv2.imshow('Imagen original', imagen)
+cv2.imshow('Imagen bordes', imagen_bordes)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+import cv2
+import numpy as np
+
+# Cargar la imagen
+imagen = cv2.imread('hoja.jpeg')
+cv2.imshow('Original', imagen)
+
+puntos_A = np.float32(([320,15], [700,215],[85,610],[530,780]))
+
+puntos_B = np.float32([[0,0],[420,0],[0,594],[420,594]])
+
+#crea matriz de transfomacion de perspectiva
+M = cv2.getPerspectiveTransform(puntos_A, puntos_B)
+
+imagen_trans = cv2.warpPerspective(imagen, M, (420,594))
+cv2.imshow('imagen final', imagen_trans)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+import cv2 as cv2
+import  numpy as np
+
+imagen_mano = cv2.imread('mano.jpg')
+imagen_cuadros = cv2.imread('cuadro.jpg')
+imagen_fichas = cv2.imread('fichas.jpg')
+
+#***********MANO**************
+# escala de grises
+gris = cv2.cvtColor(imagen_mano, cv2.COLOR_BGR2GRAY)
+
+# Binarizar la imagen
+umbral = cv2.threshold(gris, 150, 255, cv2.THRESH_BINARY_INV)[1]
+
+# Encontrar los contornos
+contornos, _ = cv2.findContours(umbral, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+
+# Obtener el contorno más grande 
+mayor_contorno = max(contornos, key=cv2.contourArea)
+
+# Encontrar el casco convexo 
+casco_convexo = cv2.convexHull(mayor_contorno)
+
+# Dibujar el contorno
+cv2.drawContours(imagen_mano, [casco_convexo], -1, (255, 0, 0), 2)
+
+#*****************SUDOKU****************
+#escala de grises
+gris_cuadro = cv2.cvtColor(imagen_cuadros, cv2.COLOR_BGR2GRAY)
+
+# Aplica Canny
+edges = cv2.Canny(gris_cuadro, 150, 150, apertureSize=3)
+
+#  detecta líneas
+lines = cv2.HoughLinesP(edges, 1, np.pi/180, threshold=100, minLineLength=100, maxLineGap=10)
+
+# Dibujar las líneas 
+if lines is not None:
+    for line in lines:
+        x1, y1, x2, y2 = line[0]
+        cv2.line(imagen_cuadros, (x1, y1), (x2, y2), (0, 0, 255), 2)
+        
+#*******************FICHAS****************
+
+gris_fichas = cv2.cvtColor(imagen_fichas, cv2.COLOR_BGR2GRAY)
+
+# suavisa para reducir el ruido
+suaveYsedoso = cv2.medianBlur(gris_fichas, 5)
+
+circles = cv2.HoughCircles(suaveYsedoso, cv2.HOUGH_GRADIENT, dp=1, minDist=50, 
+                           param1=200, param2=16, minRadius=30, maxRadius=50)
+
+if circles is not None:
+    circles = np.uint16(np.around(circles))
+    for circle in circles[0, :]:
+        center = (circle[0], circle[1])
+        radius = circle[2]
+        
+        # Dibujar el círculo encontrado
+        cv2.circle(imagen_fichas, center, radius, (0, 255, 0), 2)
+        cv2.circle(imagen_fichas, center, 2, (0, 0, 255),3)
+
+
+cv2.imshow("Imagen Mano", imagen_mano)
+cv2.imshow("Imagen Cuadros", imagen_cuadros)
+cv2.imshow("Imagen Fichas", imagen_fichas)
+cv2.waitKey(0)
+cv2.destroyAllWindows()
+
+
+

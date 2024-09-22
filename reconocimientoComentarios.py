@@ -4,7 +4,7 @@ import os
 
 def ReconocimientoDeComentarios():
     # Abre el archivo y lee su contenido línea por línea
-    with open("codigo_prueba.txt", 'r') as archivo:
+    with open("puropinshipython.txt", 'r') as archivo:
         lineas = archivo.readlines()
 
     # Define las expresiones regulares para identificar comentarios cortos y bloques de comentarios largos (tanto con comillas dobles como simples)
@@ -18,6 +18,7 @@ def ReconocimientoDeComentarios():
     with open(
             "C:\\Users\\rico_\\OneDrive\\Escritorio\\tareas UnU\\RPSE\\RecoPatronesSintacticoEstructural\\comentarios.txt",
             'w') as archivo_salida:
+        #por si hay comentarios dentro de los comentarios
         dentro_comentario_largo = False
         dentro_comentario_largodos = False
 
@@ -32,8 +33,7 @@ def ReconocimientoDeComentarios():
                 dentro_comentario_largo = True
                 if re.search(patron_largo_final, linea) and linea.count('"""') == 2:
                     dentro_comentario_largo = False  # Cierra el comentario si empieza y termina en la misma línea
-            elif dentro_comentario_largo:
-                archivo_salida.write("")
+
                 if re.search(patron_largo_final, linea):
                     dentro_comentario_largo = False  # Cierra el bloque si encuentra el final de comillas triples
 
@@ -43,8 +43,7 @@ def ReconocimientoDeComentarios():
                 dentro_comentario_largodos = True
                 if re.search(patron_largo_dos_final, linea) and linea.count("'''") == 2:
                     dentro_comentario_largodos = False  # Cierra el comentario si empieza y termina en la misma línea
-            elif dentro_comentario_largodos:
-                archivo_salida.write("")
+
                 if re.search(patron_largo_dos_final, linea):
                     dentro_comentario_largodos = False  # Cierra el bloque si encuentra el final de comillas simples
 
