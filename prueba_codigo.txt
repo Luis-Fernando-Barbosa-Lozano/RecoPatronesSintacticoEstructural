@@ -1,7 +1,8 @@
 import math
 import re
-#Entrada de Individuos en formato binario separado por comas
 """
+#Entrada de Individuos en formato binario separado por comas
+
 indBin = input('Ingrese individuos binarios separados por comas>>> ')
 
 #Obteniendo la Función de activación

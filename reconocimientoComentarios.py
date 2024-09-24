@@ -1,35 +1,81 @@
 import re
+import keyword
 import os
 
-# Abre el archivo y lee su contenido
-with open("prueba_codigo.txt", 'r') as archivo:
-    contenido = archivo.read()
+# Compilar patrones al inicio
+patrones = {
+    "numero": re.compile(r'(?<!\w)\d+(\.\d+)?([eE][+-]?\d+)?(?!\w)'),
+    "operador": re.compile(r'[+\-*/%<>=!]+'),
+    "string": re.compile(r'\"[^\"]*\"|\'[^\']*\''),
+    "comparacion": re.compile(r'==|!=|<=|>=|<|>'),
+    "puntuacion": re.compile(r'[.,;(){}\[\]]'),
+    "comentario_corto": re.compile(r'#.*'),
+    "comentario_largo": re.compile(r'(\"\"\"|\'\'\')'),
+}
 
-    # Define la expresión regular para identificar comentarios largos
-    patron_largo = r"\"\"\"[\s\S]*?\"\"\""  # Captura todo el contenido dentro de comillas triples
+# Leer archivo de entrada
+try:
+    with open("prueba_codigo.txt", "r") as archivo_entrada:
+        lineas = archivo_entrada.readlines()
+        contenido = "".join(lineas)
+        num_caracteres = len(contenido)
+except FileNotFoundError:
+    print("Archivo no encontrado.")
+    exit()
 
-    # Encuentra y cuenta los comentarios largos
-    comentarios_largos = re.findall(patron_largo, contenido)
+# Lista de palabras reservadas de Python
+palabras_reservadas = keyword.kwlist
 
-    # Elimina los comentarios largos del contenido para evitar contar comentarios cortos dentro de ellos
-    contenido_sin_largos = re.sub(patron_largo, "", contenido)
+# Procesar el contenido del archivo
+try:
+    with open("resultado.txt", "w") as archivo_salida:
+        archivo_salida.write(f"Numero de caracteres: {num_caracteres}\n\n")
 
-    # Define la expresión regular para identificar comentarios cortos que no estén dentro de bloques largos
-    patron_corto = r"#.*(?!(\"\"\"))"  # Captura comentarios cortos que no están en comentarios largos
+        dentro_comentario = False
+        for linea in lineas:
+            if dentro_comentario:
+                if patrones["comentario_largo"].search(linea):
+                    dentro_comentario = False
+                    archivo_salida.write("Token Comentario Largo\n")
+                continue
 
-    # Encuentra y cuenta los comentarios cortos en el contenido sin comentarios largos
-    comentarios_cortos = re.findall(patron_corto, contenido_sin_largos)
+            if patrones["comentario_corto"].search(linea):
+                archivo_salida.write("Token Comentario Corto\n")
+                continue
+            elif patrones["comentario_largo"].search(linea):
+                dentro_comentario = True
+                continue
 
-    # Guarda el conteo de comentarios en un archivo
-    with open("C:\\Users\\iroba\\OneDrive\\Escritorio\\comentarios.txt", 'w') as archivo:
-        archivo.write(f"comentarios cortos = {len(comentarios_cortos)}\n")
-        archivo.write(f"comentarios largos = {len(comentarios_largos)}\n")
+            # Procesar tokens en la línea
+            nueva_linea = []
+            palabras = linea.split()
+            for palabra in palabras:
+                if palabra in palabras_reservadas:
+                    nueva_linea.append("PalabraReservada")
+                elif patrones["comparacion"].match(palabra):
+                    nueva_linea.append("TokenComparacion")
+                elif patrones["operador"].match(palabra):
+                    nueva_linea.append("TokenOperador")
+                else:
+                    for tipo, patron in patrones.items():
+                        if tipo not in ["comentario_corto", "comentario_largo", "comparacion", "operador"]:
+                            if patron.match(palabra):
+                                nueva_linea.append(f'Token{tipo.capitalize()}')
+                                break
+                    else:
+                        nueva_linea.append("TOKENID")
 
-    print("El conteo de comentarios ha sido guardado en el archivo 'comentarios.txt'.")
+            archivo_salida.write(" ".join(nueva_linea) + "\n")
 
+except IOError:
+    print("Error escribiendo en el archivo de salida.")
 
-# Ruta al archivo que quieres abrir
-    archivo_path = "C:\\Users\\iroba\\OneDrive\\Escritorio\\comentarios.txt"
-
-# Abre el archivo en la aplicación predeterminada del sistema
-os.startfile(archivo_path)
+# Abrir archivo procesado
+archivo_path = os.path.abspath("resultado.txt")
+try:
+    if os.name == 'nt':  # Para Windows
+        os.startfile(archivo_path)
+    elif os.name == 'posix':  # Para macOS y Linux
+        os.system(f'open "{archivo_path}"' if os.uname().sysname == 'Darwin' else f'xdg-open "{archivo_path}"')
+except Exception as e:
+    print(f"Error al intentar abrir el archivo: {e}")
