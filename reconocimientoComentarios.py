@@ -30,7 +30,6 @@ palabras_reservadas = keyword.kwlist
 try:
     with open("resultado.txt", "w") as archivo_salida:
         archivo_salida.write(f"Numero de caracteres: {num_caracteres}\n\n")
-
         dentro_comentario = False
         for linea in lineas:
             if dentro_comentario:
@@ -75,7 +74,5 @@ archivo_path = os.path.abspath("resultado.txt")
 try:
     if os.name == 'nt':  # Para Windows
         os.startfile(archivo_path)
-    elif os.name == 'posix':  # Para macOS y Linux
-        os.system(f'open "{archivo_path}"' if os.uname().sysname == 'Darwin' else f'xdg-open "{archivo_path}"')
 except Exception as e:
     print(f"Error al intentar abrir el archivo: {e}")
