@@ -2,6 +2,20 @@ import re
 import keyword
 import os
 
+def leer_datos_txt(archivo):
+    datos = []
+    with open(archivo, 'r') as file:
+        for linea in file:
+            datos.append([valor for valor in linea.strip().split('\t')])
+    return datos
+
+# Aplanar la lista leída del archivo
+palabras_nuevas = [palabra for sublista in leer_datos_txt('pr.txt') for palabra in sublista]
+
+palabras_reservadas = keyword.kwlist + palabras_nuevas
+
+print(palabras_reservadas)
+
 # Compilar patrones al inicio
 patrones = {
     "numero": re.compile(r'(?<!\w)\d+(\.\d+)?([eE][+-]?\d+)?(?!\w)'),
@@ -23,9 +37,6 @@ except FileNotFoundError:
     print("Archivo no encontrado.")
     exit()
 
-# Lista de palabras reservadas de Python
-palabras_reservadas = keyword.kwlist
-
 # Procesar el contenido del archivo
 try:
     with open("resultado.txt", "w") as archivo_salida:
@@ -35,11 +46,11 @@ try:
             if dentro_comentario:
                 if patrones["comentario_largo"].search(linea):
                     dentro_comentario = False
-                    archivo_salida.write("Token Comentario Largo\n")
+                    archivo_salida.write("TokenCL\n")
                 continue
 
             if patrones["comentario_corto"].search(linea):
-                archivo_salida.write("Token Comentario Corto\n")
+                archivo_salida.write("TokenCC\n")
                 continue
             elif patrones["comentario_largo"].search(linea):
                 dentro_comentario = True
@@ -76,3 +87,5 @@ try:
         os.startfile(archivo_path)
 except Exception as e:
     print(f"Error al intentar abrir el archivo: {e}")
+
+

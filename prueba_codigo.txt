@@ -1,6 +1,11 @@
+While
+
+
+LuisFernandoBarbosaLozano
+3.14e-10
 import math
 import re
-"""
+
 #Entrada de Individuos en formato binario separado por comas
 
 indBin = input('Ingrese individuos binarios separados por comas>>> ')
@@ -94,4 +99,3 @@ noCruces = round((porcentajeCruce * len(lstBinaria))/100) # >>> (% de Cruce x to
 
 #Pedimos que elijan un tipo de cruce
 tipoCruce = input("Qué tió de cruce deseas hacer? 1= Cruce de un punto | 2= Cruce de dos puntos")
-"""
